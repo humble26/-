@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../settings.css">
+<style>body{background:#f4f5f7;}</style>
+</head>
+<body>
+<script>
+  // 最小 t() 桩（仅需 qrcode-share 用到的键）
+  window.t = function (k) { return k; };
+  window.showToast = function () {};
+</script>
+<script src="../qrcode.js"></script>
+<script src="../qrcode-share.js"></script>
+<script>
+  try {
+    var okLib = typeof window.qrcode === 'function';
+    window.JWD_QR.show({ title: '\u4e0a\u6d77\u4ea4\u901a\u5927\u5b66\u5b98\u7f51', url: 'https://www.sjtu.edu.cn/' });
+    var mask = document.querySelector('.qr-mask');
+    var img = document.getElementById('qr-img');
+    document.documentElement.setAttribute('data-lib', okLib ? 'ok' : 'missing');
+    document.documentElement.setAttribute('data-mask-show', mask && mask.classList.contains('show') ? 'yes' : 'no');
+    document.documentElement.setAttribute('data-img-src', img && img.src ? (img.src.slice(0, 22) + ' len=' + img.src.length) : 'none');
+    document.documentElement.setAttribute('data-img-display', img ? img.style.display : 'none');
+    document.documentElement.setAttribute('data-copy-btn', !!document.getElementById('qr-copy') ? 'yes' : 'no');
+    document.documentElement.setAttribute('data-dl-btn', !!document.getElementById('qr-download') ? 'yes' : 'no');
+    // 校验图片尺寸（应比纯二维码高出一截，含底部链接文字条）与底部文字像素
+    var probe = document.createElement('canvas');
+    var pctx = probe.getContext('2d');
+    var im = new Image();
+    im.onload = function () {
+      probe.width = im.naturalWidth;
+      probe.height = im.naturalHeight;
+      pctx.drawImage(im, 0, 0);
+      document.documentElement.setAttribute('data-size', probe.width + 'x' + probe.height);
+      // 底部链接行（倒数 30px 内）
+      var bottom = pctx.getImageData(0, probe.height - 32, probe.width, 24);
+      var darkB = 0;
+      for (var i = 0; i < bottom.data.length; i += 4) {
+        if (bottom.data[i] < 128) darkB++;
+      }
+      document.documentElement.setAttribute('data-link-dark', darkB);
+      // 名称行（二维码区下方 36~60px 一带）
+      var nameBand = pctx.getImageData(0, probe.height - 72, probe.width, 28);
+      var darkN = 0;
+      for (var j = 0; j < nameBand.data.length; j += 4) {
+        if (nameBand.data[j] < 128) darkN++;
+      }
+      document.documentElement.setAttribute('data-name-dark', darkN);
+      document.documentElement.setAttribute('data-test', 'done');
+    };
+    im.onerror = function () {
+      document.documentElement.setAttribute('data-test', 'img-error');
+    };
+    im.src = img.src;
+    document.documentElement.setAttribute('data-test', 'pending');
+  } catch (e) {
+    var m = document.querySelector('.qr-mask');
+    document.documentElement.setAttribute('data-test', 'error:' + e.message);
+    document.documentElement.setAttribute('data-stack', String(e.stack || '').slice(0, 400));
+    if (m) {
+      var ids = ['qr-close-btn', 'qr-copy', 'qr-download', 'qr-title', 'qr-content', 'qr-hint', 'qr-img']
+        .map(function (id) { return id + '=' + (m.querySelector('#' + id) ? 'Y' : 'N'); })
+        .join('|');
+      document.documentElement.setAttribute('data-ids', ids);
+      document.documentElement.setAttribute('data-close-cls', m.querySelector('.qr-close') ? 'Y' : 'N');
+    }
+  }
+</script>
+</body>
+</html>

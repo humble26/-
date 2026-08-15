@@ -1,0 +1,5 @@
+case 0: https://www.sjtu.edu.cn/ -> decoded=https://www.sjtu.edu.cn/ OK
+case 1: https://jaccount.sjtu.edu.cn/ -> decoded=https://jaccount.sjtu.edu.cn/ OK
+case 2: 上海交通大学图书馆 -> decoded=上海交通大学图书馆 OK
+case 3: https://i.sjtu.edu.cn/very/long/path?x=1 -> decoded=https://i.sjtu.edu.cn/very/long/path?x=1 OK
+ALL QR DECODE TESTS PASSED
